@@ -40,7 +40,7 @@ public class UI : MonoBehaviour
         mvmtScript.movementEnabled = false;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        interactionConfig.robotName = robotNameField.text;
+        
         Time.timeScale = 0f;
     }
 
@@ -84,6 +84,12 @@ public class UI : MonoBehaviour
         mvmtScript.Go();
     }
 
+    public void StartGame()
+    {
+        UnityEngine.Debug.Log(robotNameField.text);
+        interactionConfig.robotName = robotNameField.text;
+        ContinueGame();
+    }
     public void QuitGame()
     {
         // Pause > Quit

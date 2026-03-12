@@ -68,7 +68,7 @@ public class WakeUpRobot : MonoBehaviour
 
         ProcessStartInfo psi = new ProcessStartInfo();
         psi.FileName = "/bin/bash";
-        psi.Arguments = $"-c \"export VLA_STAR_PATH=Robotics/Projects/VLA_Star; setsid {scriptPath} {robotName} > {logPath} 2>&1\"";
+        psi.Arguments = $"-c \"source ~/.bashrc; setsid {scriptPath} {robotName} > {logPath} 2>&1\""; // Should be changed to source a custom VLA* environment
         psi.UseShellExecute = false;
         psi.CreateNoWindow = true;
 
