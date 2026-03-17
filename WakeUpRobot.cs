@@ -10,6 +10,10 @@ public class WakeUpRobot : MonoBehaviour
     public float interactRadius = 2f;
     
     public string robotName = "defaultRobot";
+    public string agencyType = "Auto";
+    public string playMode = "Free";
+    public string chatMedium = "Realtime";
+
     private Process robotProcess;
     int pidGroup;
     public Light robotLight;
@@ -51,10 +55,12 @@ public class WakeUpRobot : MonoBehaviour
             if (robotProcess == null || robotProcess.HasExited)
             {
                 StartRobot();
+                Logger.Log($"INTERACTION", $"Robot {robotName} activated");
             }
             else
             {
                 StopRobot();
+                Logger.Log($"INTERACTION", $"Robot {robotName} deactivated");
             }
         }
     }
@@ -68,7 +74,7 @@ public class WakeUpRobot : MonoBehaviour
 
         ProcessStartInfo psi = new ProcessStartInfo();
         psi.FileName = "/bin/bash";
-        psi.Arguments = $"-c \"source ~/.bashrc; setsid {scriptPath} {robotName} > {logPath} 2>&1\""; // Should be changed to source a custom VLA* environment
+        psi.Arguments = $"-c \"source ~/.bashrc; setsid {scriptPath} {robotName} {playMode} {agencyType} {chatMedium} > {logPath} 2>&1\""; // Should be changed to source a custom VLA* environment
         psi.UseShellExecute = false;
         psi.CreateNoWindow = true;
 

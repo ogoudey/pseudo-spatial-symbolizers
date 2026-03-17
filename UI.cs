@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 public class UI : MonoBehaviour
 {
     public GameObject pauseMenu;
@@ -11,6 +12,9 @@ public class UI : MonoBehaviour
     public PlayerMovement mvmtScript;
 
     public TMP_InputField robotNameField;
+    public TMP_Dropdown playModeDropdown;
+    public TMP_Dropdown chatMediumDropdown;
+    public Toggle agencyTypeToggle;
     public WakeUpRobot interactionConfig;
 
     void Start()
@@ -88,6 +92,9 @@ public class UI : MonoBehaviour
     {
         UnityEngine.Debug.Log(robotNameField.text);
         interactionConfig.robotName = robotNameField.text;
+        interactionConfig.playMode = playModeDropdown.options[playModeDropdown.value].text;
+        interactionConfig.chatMedium = chatMediumDropdown.options[chatMediumDropdown.value].text;
+        interactionConfig.agencyType = agencyTypeToggle.isOn ? "Demoed" : "Auto";
         ContinueGame();
     }
     public void QuitGame()

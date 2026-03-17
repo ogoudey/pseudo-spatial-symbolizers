@@ -22,7 +22,7 @@ public class PressurePlate : MonoBehaviour
         Collider[] hits = Physics.OverlapSphere(transform.position, triggerRadius);
 
         bool platePressed = false;
-
+        string agent = "";
         foreach (var hit in hits)
         {
             // Check if the hit object OR one of its parents is in allowedObjects
@@ -33,6 +33,7 @@ public class PressurePlate : MonoBehaviour
                 if (hit.transform == allowed.transform ||
                     hit.transform.IsChildOf(allowed.transform))
                 {
+                    agent = hit.gameObject.name;
                     platePressed = true;
                     break;
                 }
@@ -44,11 +45,13 @@ public class PressurePlate : MonoBehaviour
 
         if (platePressed && !isActive)
         {
+            Logger.Log($"EVENT", $"{gameObject.name} pressed by {agent}");
             isActive = true;
             OpenGate();
         }
         else if (!platePressed && isActive)
         {
+            Logger.Log($"EVENT", $"{gameObject.name} unpressed");
             isActive = false;
             CloseGate();
         }

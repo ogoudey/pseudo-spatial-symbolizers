@@ -59,6 +59,7 @@ public class Lever : MonoBehaviour
             Animator anim = GetComponent<Animator>();
             if (anim) anim.SetBool(leverAnimatorParameterName, false);
             CloseGate();
+            Logger.Log($"EVENT", $"{gameObject.name} switched CLOSED");
             isPulled = false;
         }
         else
@@ -66,6 +67,7 @@ public class Lever : MonoBehaviour
             Animator anim = GetComponent<Animator>();
             if (anim) anim.SetBool(leverAnimatorParameterName, true);
             OpenGate();
+            Logger.Log($"EVENT", $"{gameObject.name} switched OPEN");
             isPulled = true;
         }
         return isPulled;

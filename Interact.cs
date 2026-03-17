@@ -121,6 +121,7 @@ public class Interact : MonoBehaviour
                 Transform targetT = electrics.Find(t => t.gameObject.name == msg.arg);
                 Lever lever = targetT.GetComponent<Lever>();
                 bool isNowOpen = lever.Activate();
+                Logger.Log($"EVENT", $"{msg.arg} switched by robot");
                 if (isNowOpen){
                     outboundMessageQueue.Enqueue(new OutputMsg { type = "status", content = new string[] { $"switched {msg.arg} to keep gate open" } });
                 } else {
