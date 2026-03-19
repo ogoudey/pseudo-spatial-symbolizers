@@ -169,8 +169,9 @@ public class MoveTo : MonoBehaviour
             outboundMessageQueue.Enqueue(new OutputMsg { type = "status", content = new string[] { $"reached {currentGoal.name}" } });
             UnityEngine.Debug.Log($"Sending status reached {currentGoal.name}");
             sentReachedStatus = true;
-            if (currentGoal.name == "ATM")
+            if (currentGoal.name == "Gold")
             {
+                UnityEngine.Debug.Log($"Reached Gold.");
                 Logger.AgentWin();
             }
         }

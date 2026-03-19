@@ -38,7 +38,7 @@ public class Logger : MonoBehaviour
     {
         if (Instance == null)
             Debug.Log("Why is instance null?");
-        Log("INTERACTION", "robot reached goal");
+        
         Instance.agentWinning = true;
         Instance.Coordinated();
     }
@@ -47,19 +47,28 @@ public class Logger : MonoBehaviour
     {   
         if (Instance == null)
             Debug.Log("Why is instance null?");
-        Log("INTERACTION", "player reached goal");
-        Instance.agentWinning = true;
+        
+        Instance.playerWinning = true;
         Instance.Coordinated();
     }
 
-    public void Coordinated()
+    public bool Coordinated()
     {
+        
         if (agentWinning && playerWinning)
         {
             Log("INTERACTION", "closed - both won");
             QuitGame();
+            return true;
         }
-            
+        else
+        {
+            if (agentWinning)
+                Log("INTERACTION", "robot reached goal");
+            if (playerWinning)
+                Log("INTERACTION", "player reached goal");    
+            return false;   
+        }         
     }
 
 
@@ -76,6 +85,8 @@ public class Logger : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        Directory.CreateDirectory(Path.Combine(Application.dataPath, "Data"));
 
         // Open log file (append so multiple sessions are preserved)
         _logFilePath = Path.Combine(Application.dataPath, "Data", logFileName);
@@ -101,7 +112,12 @@ public class Logger : MonoBehaviour
     private void OutOfTime()
     {
         robotInterface.StopRobot();
-        Log("INTERACTION", "closed - out of time");
+        
+        if (agentWinning)
+            Log("INTERACTION", "only robot reached goal");
+        if (playerWinning)
+            Log("INTERACTION", "only player reached goal");    
+        
         QuitGame();
         
     }
