@@ -33,9 +33,9 @@ public class Logger : MonoBehaviour
     private string _logGameFilePath;
     private static StreamWriter _gameWriter;
 
-    private string logExperimentalFileName;
-    private string _logExperimentalFilePath;
-    private static StreamWriter _experimentalWriter;
+    private string logExperimentFileName;
+    private string _logExperimentFilePath;
+    private static StreamWriter _ExperimentWriter;
 
     private GameObject player;
     private GameObject robot;
@@ -106,10 +106,10 @@ public class Logger : MonoBehaviour
         _gameWriter      = new StreamWriter(_logGameFilePath, append: true) { AutoFlush = true };
         if (new FileInfo(_logGameFilePath).Length == 0)
             _gameWriter.WriteLine("timestamp_unix,tag,message");
-        _logExperimentalFilePath = Path.Combine(Application.dataPath, "Data", "Experimental", logExperimentalFileName);
-        _experimentalWriter      = new StreamWriter(_logExperimentalFilePath, append: true) { AutoFlush = true };
-        if (new FileInfo(_logExperimentalFilePath).Length == 0)
-            _experimentalWriter.WriteLine("timestamp_unix,playerX,playerY,playerZ,robotX,robotY,robotZ");
+        _logExperimentFilePath = Path.Combine(Application.dataPath, "Data", "Experiment", logExperimentFileName);
+        _ExperimentWriter      = new StreamWriter(_logExperimentFilePath, append: true) { AutoFlush = true };
+        if (new FileInfo(_logExperimentFilePath).Length == 0)
+            _ExperimentWriter.WriteLine("timestamp_unix,playerX,playerY,playerZ,robotX,robotY,robotZ");
     }
 
     public void StartGame()
@@ -119,7 +119,7 @@ public class Logger : MonoBehaviour
         // Main Menu -> Start
         string selectedPlayMode = playModeDropdown.options[playModeDropdown.value].text;
         logGameFileName = participantNameField.text + "_" + robotNameField.text + "_" + selectedPlayMode + ".csv";
-        logExperimentalFileName = participantNameField.text + "_" + robotNameField.text + ".csv";
+        logExperimentFileName = participantNameField.text + "_" + robotNameField.text + ".csv";
         WriteHeaders();
 
         Log("INTERACTION", $"{participantNameField.text} and {robotNameField.text} started play mode {selectedPlayMode}");
@@ -144,7 +144,7 @@ public class Logger : MonoBehaviour
 
     public void Update()
     {
-        LogExperimental();
+        LogExperiment();
     }
 
     private void OutOfTime()
@@ -209,9 +209,9 @@ public class Logger : MonoBehaviour
         return s;
     }
 
-    public void LogExperimental()
+    public void LogExperiment()
     {
-        if (_experimentalWriter == null) return;
+        if (_ExperimentWriter == null) return;
         double unixTime  = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000.0;
 
         // Get the position of the player (tag Player)
@@ -225,7 +225,7 @@ public class Logger : MonoBehaviour
         string robotCoordinates = $"{robotPos.x},{robotPos.y},{robotPos.z}";
 
         // Write to file
-        _experimentalWriter.WriteLine($"{unixTime},{playerCoordinates},{robotCoordinates}");
+        _ExperimentWriter.WriteLine($"{unixTime},{playerCoordinates},{robotCoordinates}");
     }
     
 
