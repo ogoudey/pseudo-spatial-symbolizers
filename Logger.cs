@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 
 /// <summary>
@@ -23,17 +24,28 @@ public class Logger : MonoBehaviour
     public TMP_InputField robotNameField;
     public TMP_InputField maxSessionSecondsField;
     public TMP_Dropdown playModeDropdown;
-    private string logFileName;
+    
     [SerializeField] private float maxSessionSeconds = 300f; // 5 min default
     private float _sessionStartTime;
 
     // ── Internals ──────────────────────────────────────────────────────────────
-    private string _logFilePath;
-    private static StreamWriter _writer;
+    private string logGameFileName;
+    private string _logGameFilePath;
+    private static StreamWriter _gameWriter;
+
+    private string logExperimentalFileName;
+    private string _logExperimentalFilePath;
+    private static StreamWriter _experimentalWriter;
+
+    private GameObject player;
+    private GameObject robot;
+
     
     // WIN CONDITIONS
     public bool agentWinning = false;
     public bool playerWinning = false;
+    public List<GameObject> publicPositions = new();
+
     public static void AgentWin()
     {
         if (Instance == null)
@@ -87,26 +99,52 @@ public class Logger : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         Directory.CreateDirectory(Path.Combine(Application.dataPath, "Data"));
+        Directory.CreateDirectory(Path.Combine(Application.dataPath, "Data", "Experiment"));
 
-        // Open log file (append so multiple sessions are preserved)
-        _logFilePath = Path.Combine(Application.dataPath, "Data", logFileName);
-        _writer      = new StreamWriter(_logFilePath, append: true) { AutoFlush = true };
 
-        // Write CSV header if the file is brand-new
-        if (new FileInfo(_logFilePath).Length == 0)
-            _writer.WriteLine("timestamp_unix,tag,message");
+        _logGameFilePath = Path.Combine(Application.dataPath, "Data", logGameFileName);
+        _gameWriter      = new StreamWriter(_logGameFilePath, append: true) { AutoFlush = true };
+        if (new FileInfo(_logGameFilePath).Length == 0)
+            _gameWriter.WriteLine("timestamp_unix,tag,message");
+        _logExperimentalFilePath = Path.Combine(Application.dataPath, "Data", "Experimental", logExperimentalFileName);
+        _experimentalWriter      = new StreamWriter(_logExperimentalFilePath, append: true) { AutoFlush = true };
+        if (new FileInfo(_logExperimentalFilePath).Length == 0)
+            _experimentalWriter.WriteLine("timestamp_unix,playerX,playerY,playerZ,robotX,robotY,robotZ");
     }
 
     public void StartGame()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
+        robot = GameObject.Find("Robot");
         // Main Menu -> Start
         string selectedPlayMode = playModeDropdown.options[playModeDropdown.value].text;
-        logFileName = selectedPlayMode + "_" + participantNameField.text + "_" + robotNameField.text + ".csv";
+        logGameFileName = participantNameField.text + "_" + robotNameField.text + "_" + selectedPlayMode + ".csv";
+        logExperimentalFileName = participantNameField.text + "_" + robotNameField.text + ".csv";
         WriteHeaders();
+
         Log("INTERACTION", $"{participantNameField.text} and {robotNameField.text} started play mode {selectedPlayMode}");
+        List<string> entries = new List<string>();
+
+        foreach (GameObject obj in publicPositions)
+        {
+            if (obj != null)
+            {
+                Vector3 pos = obj.transform.position;
+                entries.Add($"{obj.name}:({pos.x},{pos.y},{pos.z})");
+            }
+        }
+
+        string dictLike = "{" + string.Join(";", entries) + "}";
+        Log("STATIC_POSITIONS", $"{dictLike}");
+
         _sessionStartTime = Time.time;
         maxSessionSeconds = int.TryParse(maxSessionSecondsField.text, out int parsed) ? parsed : 120;
         Invoke(nameof(OutOfTime), maxSessionSeconds);
+    }
+
+    public void Update()
+    {
+        LogExperimental();
     }
 
     private void OutOfTime()
@@ -125,14 +163,14 @@ public class Logger : MonoBehaviour
     private void OnApplicationQuit()
     {
         Log("INTERACTION", "closed");
-        _writer?.Close();
+        _gameWriter?.Close();
     }
 
     private void OnDestroy()
     {
         // Safety close in case the object is destroyed before quit
         if (Instance == this)
-            _writer?.Close();
+            _gameWriter?.Close();
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -146,7 +184,7 @@ public class Logger : MonoBehaviour
     /// <param name="message">Free-form message. Commas are escaped automatically.</param>
     public static void Log(string tag, string message)
     {
-        if (_writer == null) return;
+        if (_gameWriter == null) return;
 
         double unixTime  = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000.0;
 
@@ -154,12 +192,12 @@ public class Logger : MonoBehaviour
         string safeTag     = Escape(tag);
         string safeMessage = Escape(message);
 
-        _writer.WriteLine($"{unixTime},{safeTag},{safeMessage}");
+        _gameWriter.WriteLine($"{unixTime},{safeTag},{safeMessage}");
     }
 
     /// <summary>Convenience overload — logs with tag "INFO".</summary>
     public static void Log(string message) => Log("INFO", message);
-
+        
     // ══════════════════════════════════════════════════════════════════════════
     //  Helpers
     // ══════════════════════════════════════════════════════════════════════════
@@ -171,6 +209,24 @@ public class Logger : MonoBehaviour
         return s;
     }
 
+    public void LogExperimental()
+    {
+        if (_experimentalWriter == null) return;
+        double unixTime  = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000.0;
+
+        // Get the position of the player (tag Player)
+        
+        Vector3 playerPos = player.transform.position;
+        string playerCoordinates = $"{playerPos.x},{playerPos.y},{playerPos.z}";
+
+        // Get the position of the robot (object named Robot)
+        
+        Vector3 robotPos = robot.transform.position;
+        string robotCoordinates = $"{robotPos.x},{robotPos.y},{robotPos.z}";
+
+        // Write to file
+        _experimentalWriter.WriteLine($"{unixTime},{playerCoordinates},{robotCoordinates}");
+    }
     
 
     public void QuitGame()
