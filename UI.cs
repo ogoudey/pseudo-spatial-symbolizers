@@ -12,9 +12,11 @@ public class UI : MonoBehaviour
     public PlayerMovement mvmtScript;
 
     public TMP_InputField robotNameField;
-    public TMP_Dropdown playModeDropdown;
-    public TMP_Dropdown chatMediumDropdown;
     public Toggle agencyTypeToggle;
+
+    public TMP_Dropdown playModeDropdown;
+    public TMP_Dropdown contextTypeDropdown;
+    public TMP_Dropdown chatMediumDropdown;
     public WakeUpRobot interactionConfig;
 
     void Start()
@@ -92,9 +94,10 @@ public class UI : MonoBehaviour
     {
         UnityEngine.Debug.Log(robotNameField.text);
         interactionConfig.robotName = robotNameField.text;
-        interactionConfig.playMode = playModeDropdown.options[playModeDropdown.value].text;
-        interactionConfig.chatMedium = chatMediumDropdown.options[chatMediumDropdown.value].text;
         interactionConfig.agencyType = agencyTypeToggle.isOn ? "Demoed" : "Auto";
+        interactionConfig.playMode = playModeDropdown.options[playModeDropdown.value].text;
+        interactionConfig.contextType = contextTypeDropdown.options[contextTypeDropdown.value].text;
+        interactionConfig.chatMedium = chatMediumDropdown.options[chatMediumDropdown.value].text;
         ContinueGame();
     }
     public void QuitGame()
