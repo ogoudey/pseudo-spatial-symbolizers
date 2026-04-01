@@ -5,7 +5,7 @@ using System.Collections.Concurrent;
 public class Interact : MonoBehaviour
 {
     [Header("Pickup Settings")]
-    public float reachRadius = 1.5f;
+    public float reachRadius = 2.5f;
     public Transform holdPoint;
     public string interactableTag = "Interactable";
     public string electricTag = "Electric";

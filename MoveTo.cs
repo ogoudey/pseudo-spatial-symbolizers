@@ -16,7 +16,7 @@ public class MoveTo : MonoBehaviour
     public Transform currentGoal;
 
     [Header("Movementt")]
-    public float reachedDistance = 1.0f;
+    public float reachedDistance = 2.0f;
     public bool sentReachedStatus = false;
     private NavMeshAgent agent;
     private Transform lastGoal;
@@ -124,10 +124,8 @@ public class MoveTo : MonoBehaviour
 
         if (agent.pathPending)
             return;
-
         // 🔹 Reached goal?
-        if (agent.remainingDistance <= agent.stoppingDistance &&
-            !agent.hasPath)
+        if (agent.remainingDistance <= agent.stoppingDistance)
         {
             OnReachedGoal();
         }
