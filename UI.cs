@@ -98,6 +98,7 @@ public class UI : MonoBehaviour
         interactionConfig.playMode = playModeDropdown.options[playModeDropdown.value].text;
         interactionConfig.contextType = contextTypeDropdown.options[contextTypeDropdown.value].text;
         interactionConfig.chatMedium = chatMediumDropdown.options[chatMediumDropdown.value].text;
+        Logger.Log("CONFIG", $"{interactionConfig.playMode}");
         ContinueGame();
     }
     public void QuitGame()
